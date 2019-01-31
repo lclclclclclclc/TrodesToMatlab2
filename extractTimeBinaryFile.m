@@ -16,33 +16,33 @@ function extractTimeBinaryFile(fileNameMask, newConfig, reconfigSuffix)
 % modified to allow reconfiguration
 % github.com/lclclclclclclc/TrodesToMatlab2.git
 
-
+%% Set -output and -reconfig options for executable call
 if nargin > 4
     error('extractTimeBinaryFile:TooManyInputs', ...
         'requires at most 3 optional inputs');
 end
 if nargin > 1
-    reconfig = true
+    reconfig = true;
 else
-    reconfig = false
+    reconfig = false;
 end
 
 
 if reconfig
     if nargin == 2 % no new output suffix specified by user
-        timestr = datestr(datetime(), 'yyyymmdd_HHMMss')
-        reconfigSuffix = ['_reconfig', newConfig, '_', timestr]
+        timestr = datestr(datetime(), 'yyyymmdd_HHMMss');
+        reconfigSuffix = ['_reconfig', newConfig, '_', timestr];
     end
     
-    newConfigFileName = [newConfig, '.trodesconf']
-    reconfigString = [' -reconfig ', newConfigFileName]
+    newConfigFileName = [newConfig, '.trodesconf'];
+    reconfigString = [' -reconfig ', newConfigFileName];
     
 else
-    reconfigSuffix = ''
-    reconfigString = ''
+    reconfigSuffix = '';
+    reconfigString = '';
 end
 
-outputString = [' -output ', fileNameMask, reconfigSuffix]
+outputString = [' -output ', fileNameMask, reconfigSuffix];
 
 %% Original loop over recording files
 % unused by EG so i>1 not tested
