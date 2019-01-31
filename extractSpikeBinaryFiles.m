@@ -12,6 +12,11 @@ function extractSpikeBinaryFiles(fileNameMask)
 %'myfile' for myfile_part1.rec and myfile_part2.rec).  The files will be
 %stiched together sorted by the time when the files were created. 
 
+% modified to allow reconfiguration
+% github.com/lclclclclclclc/TrodesToMatlab2.git
+
+%% Original loop over recording files
+% unused by EG so i>1 not tested
 recFiles = dir([fileNameMask,'*.rec']);
 
 recFileString = [];
@@ -24,6 +29,7 @@ for i=1:length(sind)
     recFileString = [recFileString ' -rec ' recFiles(sind(i)).name];
 end
 
+%% Create call to executable program
 %Find the path to the extraction programs
 trodesPath = which('trodes_path_placeholder.m');
 trodesPath = fileparts(trodesPath);
