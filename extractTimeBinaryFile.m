@@ -1,4 +1,4 @@
-function extractTimeBinaryFile(fileNameMask)
+function extractTimeBinaryFile(fileNameMask, newConfig, reconfigSuffix)
 %
 %extractTimeBinaryFile(fileNameMask)
 %
@@ -16,6 +16,34 @@ function extractTimeBinaryFile(fileNameMask)
 % modified to allow reconfiguration
 % github.com/lclclclclclclc/TrodesToMatlab2.git
 
+
+if nargin > 4
+    error('extractTimeBinaryFile:TooManyInputs', ...
+        'requires at most 3 optional inputs');
+end
+if nargin > 1
+    reconfig = true
+else
+    reconfig = false
+end
+
+
+if reconfig
+    if nargin == 2 % no new output suffix specified by user
+        timestr = datestr(datetime(), 'yyyymmdd_HHMMss')
+        reconfigSuffix = ['_reconfig', newConfig, '_', timestr]
+    end
+    
+    newConfigFileName = [newConfig, '.trodesconf']
+    reconfigString = [' -reconfig ', newConfigFileName]
+    
+else
+    reconfigSuffix = ''
+    reconfigString = ''
+end
+
+outputString = [' -output ', fileNameMask, reconfigSuffix]
+
 %% Original loop over recording files
 % unused by EG so i>1 not tested
 recFiles = dir([fileNameMask,'*.rec']);
@@ -30,22 +58,22 @@ for i=1:length(sind)
     recFileString = [recFileString ' -rec ' recFiles(sind(i)).name];
 end
 
-
 %% Create call to executable program
 %Find the path to the extraction programs
 trodesPath = which('trodes_path_placeholder.m');
 trodesPath = fileparts(trodesPath);
 
+disp([fullfile(trodesPath,'exporttime'), recFileString, outputString, reconfigString]);
+
 %Beacuse the path may have spaces in it, we deal with it differently in
 %windows vs mac/linux
-disp(['"',fullfile(trodesPath,'exporttime'),'"', recFileString, ' -output ', fileNameMask]);
+
 if ispc
-%    eval(['!"',fullfile(trodesPath,'exporttime'),'"', recFileString, ' -output ', fileNameMask]);
-    eval(['!',fullfile(trodesPath,'exporttime'),'', recFileString, ' -output ', fileNameMask]);
+    eval(['!',fullfile(trodesPath,'exporttime'), recFileString, outputString, reconfigString]);
 else
     escapeChar = '\ ';
     trodesPath = strrep(trodesPath, ' ', escapeChar);
-    eval(['!',fullfile(trodesPath,'exporttime'), recFileString, ' -output ', fileNameMask]);
+    eval(['!',fullfile(trodesPath,'exporttime'), recFileString, outputString, reconfigString]);
 end
 
 
