@@ -1,4 +1,4 @@
-function extractDioBinaryFiles(fileNameMask)
+function extractDioBinaryFiles(fileNameMask, newConfig, reconfigSuffix)
 %
 %extractSpikeDioFiles(fileNameMask)
 %
@@ -12,6 +12,39 @@ function extractDioBinaryFiles(fileNameMask)
 %'myfile' for myfile_part1.rec and myfile_part2.rec).  The files will be
 %stiched together sorted by the time when the files were created. 
 
+% modified to allow reconfiguration
+% github.com/lclclclclclclc/TrodesToMatlab2.git
+
+%% Set -output and -reconfig options for executable call
+if nargin > 4
+    error('extractDioBinaryFile:TooManyInputs', ...
+        'requires at most 3 optional inputs');
+end
+if nargin > 1
+    reconfig = true;
+else
+    reconfig = false;
+end
+
+
+if reconfig
+    if nargin == 2 % no new output suffix specified by user
+        timestr = datestr(datetime(), 'yyyymmdd_HHMMss');
+        reconfigSuffix = ['_reconfig', newConfig, '_', timestr];
+    end
+    
+    newConfigFileName = [newConfig, '.trodesconf'];
+    reconfigString = [' -reconfig ', newConfigFileName];
+    
+else
+    reconfigSuffix = '';
+    reconfigString = '';
+end
+
+outputString = [' -output ', fileNameMask, reconfigSuffix];
+
+%% Original loop over recording files
+% unused by EG so i>1 not tested
 recFiles = dir([fileNameMask,'*.rec']);
 
 recFileString = [];
@@ -24,18 +57,17 @@ for i=1:length(sind)
     recFileString = [recFileString ' -rec ' recFiles(sind(i)).name];
 end
 
+%% Create call to executable program
 %Find the path to the extraction programs
 trodesPath = which('trodes_path_placeholder.m');
 trodesPath = fileparts(trodesPath);
 
+disp([fullfile(trodesPath,'exportdio'), recFileString, outputString, reconfigString]);
 
 %Beacuse the path may have spaces in it, we deal with it differently in
 %windows vs mac/linux
-disp(['"',fullfile(trodesPath,'exportdio'),'"', recFileString, ' -output ', fileNameMask]);
 if ispc
-    %eval(['!"',fullfile(trodesPath,'exportdio'),'"', recFileString, ' -output ', fileNameMask]);
     eval(['!',fullfile(trodesPath,'exportdio'),'', recFileString, ' -output ', fileNameMask]);
-    %eval(['!',fullfile(trodesPath,'exportdio'),'', recFileString, ' -reconfig ', 'VIP-Ai32-CNT-17-Map5-TT12.trodesconf' , ' -output ', fileNameMask, '_reconfigT12']);
 else
     escapeChar = '\ ';
     trodesPath = strrep(trodesPath, ' ', escapeChar);
