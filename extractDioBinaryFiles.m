@@ -67,11 +67,11 @@ disp([fullfile(trodesPath,'exportdio'), recFileString, outputString, reconfigStr
 %Beacuse the path may have spaces in it, we deal with it differently in
 %windows vs mac/linux
 if ispc
-    eval(['!',fullfile(trodesPath,'exportdio'),'', recFileString, ' -output ', fileNameMask]);
+    eval(['!',fullfile(trodesPath,'exportdio'), recFileString, outputString, reconfigString]);
 else
     escapeChar = '\ ';
     trodesPath = strrep(trodesPath, ' ', escapeChar);
-    eval(['!',fullfile(trodesPath,'exportdio'), recFileString, ' -output ', fileNameMask]);
+    eval(['!',fullfile(trodesPath,'exportdio'), recFileString, outputString, reconfigString]);
 end
 
 
